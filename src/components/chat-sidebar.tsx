@@ -36,7 +36,7 @@ export function ChatSidebar({ contacts, activeChat, onSelectChat, isDarkMode, on
       {/* Header */}
       <div className="p-5 border-b border-border/30 dark:border-slate-700/50">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-semibold text-foreground dark:text-white">Messages</h2>
+          <h2 className="text-2xl font-semibold text-foreground dark:text-white">Chatstream</h2>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
