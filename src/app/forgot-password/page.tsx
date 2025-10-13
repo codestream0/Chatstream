@@ -1,0 +1,88 @@
+"use client"
+
+import type React from "react"
+
+import { useState } from "react"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { ArrowLeft } from "lucide-react"
+
+export default function ForgotPasswordPage() {
+  const [email, setEmail] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+  const [isSubmitted, setIsSubmitted] = useState(false)
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+    // Simulate API call
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+    setIsLoading(false)
+    setIsSubmitted(true)
+  }
+
+  return (
+    <main className="min-h-screen relative flex items-center justify-center p-4 bg-gradient-to-br from-pink-100 via-purple-50 to-blue-100 dark:from-slate-900 dark:via-purple-950 dark:to-slate-900 animate-gradient">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-300/30 dark:bg-purple-500/20 rounded-full blur-3xl animate-float" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-pink-300/30 dark:bg-pink-500/20 rounded-full blur-3xl animate-float animation-delay-2000" />
+        <div className="absolute top-1/2 right-1/3 w-96 h-96 bg-blue-300/30 dark:bg-blue-500/20 rounded-full blur-3xl animate-float animation-delay-4000" />
+      </div>
+
+      <Card className="w-full max-w-md shadow-2xl relative z-10 backdrop-blur-xl bg-white/80 dark:bg-slate-900/80 border-white/20">
+        <CardHeader className="space-y-1 text-center">
+          <CardTitle className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+            {isSubmitted ? "Check your email" : "Forgot password?"}
+          </CardTitle>
+          <CardDescription className="text-base">
+            {isSubmitted
+              ? "We've sent a password reset link to your email address"
+              : "Enter your email and we'll send you a reset link"}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {!isSubmitted ? (
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="name@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="h-11"
+                />
+              </div>
+              <Button type="submit" className="w-full h-11 text-base" disabled={isLoading}>
+                {isLoading ? "Sending..." : "Send reset link"}
+              </Button>
+            </form>
+          ) : (
+            <div className="space-y-4">
+              <div className="rounded-lg bg-primary/10 p-4 text-center text-sm text-primary">
+                If an account exists with {email}, you will receive a password reset email shortly.
+              </div>
+              <Button asChild className="w-full h-11 text-base">
+                <Link href="/login">Return to login</Link>
+              </Button>
+            </div>
+          )}
+          <div className="mt-6 text-center">
+            <Link
+              href="/login"
+              className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to login
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
+    </main>
+  )
+}

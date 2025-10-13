@@ -3,14 +3,15 @@
 import { useEffect, useRef } from "react"
 import { cn } from "@/lib/utils"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
-import type { Message } from "@/components/chat-window"
+import type { Message, Contact } from "./chat-window"
 
 interface ChatMessagesProps {
   messages: Message[]
   isTyping?: boolean
+  activeContact: Contact
 }
 
-export function ChatMessages({ messages, isTyping }: ChatMessagesProps) {
+export function ChatMessages({ messages, isTyping, activeContact }: ChatMessagesProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -26,10 +27,10 @@ export function ChatMessages({ messages, isTyping }: ChatMessagesProps) {
           style={{ animationDelay: `${index * 50}ms` }}
         >
           {message.sender === "other" && (
-            <Avatar className="h-8 w-8 flex-shrink-0 ring-2 ring-border/20 shadow-sm">
-              <AvatarImage src={message.avatar || "/placeholder.svg"} />
-              <AvatarFallback className="bg-muted text-muted-foreground text-xs">
-                {message.senderName?.slice(0, 2)}
+            <Avatar className="h-8 w-8 flex-shrink-0 ring-2 ring-border/20 dark:ring-slate-700 shadow-sm">
+              <AvatarImage src={activeContact.avatar || "/placeholder.svg"} />
+              <AvatarFallback className="bg-muted dark:bg-slate-700 text-muted-foreground dark:text-slate-300 text-xs">
+                {activeContact.name.slice(0, 2)}
               </AvatarFallback>
             </Avatar>
           )}
@@ -41,35 +42,37 @@ export function ChatMessages({ messages, isTyping }: ChatMessagesProps) {
               className={cn(
                 "rounded-2xl px-4 py-3 text-pretty shadow-md transition-all hover:shadow-lg backdrop-blur-sm",
                 message.sender === "user"
-                  ? "bg-primary text-primary-foreground rounded-br-md border border-primary/20"
-                  : "bg-secondary text-secondary-foreground rounded-bl-md border border-border/30",
+                  ? "bg-primary text-primary-foreground rounded-br-md border border-primary/20 dark:border-primary/30"
+                  : "bg-secondary dark:bg-slate-800 text-secondary-foreground dark:text-white rounded-bl-md border border-border/30 dark:border-slate-700",
               )}
             >
               <p className="text-sm leading-relaxed">{message.text}</p>
             </div>
-            <span className="text-xs text-muted-foreground px-1">{message.timestamp}</span>
+            <span className="text-xs text-muted-foreground dark:text-slate-400 px-1">{message.timestamp}</span>
           </div>
         </div>
       ))}
 
       {isTyping && (
         <div className="flex gap-3 animate-slide-up">
-          <Avatar className="h-8 w-8 ring-2 ring-border/20 shadow-sm">
-            <AvatarImage src="/professional-person.png" />
-            <AvatarFallback className="bg-muted text-muted-foreground text-xs">SC</AvatarFallback>
+          <Avatar className="h-8 w-8 ring-2 ring-border/20 dark:ring-slate-700 shadow-sm">
+            <AvatarImage src={activeContact.avatar || "/placeholder.svg"} />
+            <AvatarFallback className="bg-muted dark:bg-slate-700 text-muted-foreground dark:text-slate-300 text-xs">
+              {activeContact.name.slice(0, 2)}
+            </AvatarFallback>
           </Avatar>
-          <div className="bg-secondary backdrop-blur-sm rounded-2xl rounded-bl-md px-4 py-3 shadow-md border border-border/30">
+          <div className="bg-secondary dark:bg-slate-800 backdrop-blur-sm rounded-2xl rounded-bl-md px-4 py-3 shadow-md border border-border/30 dark:border-slate-700">
             <div className="flex gap-1">
               <span
-                className="w-2 h-2 bg-muted-foreground/60 rounded-full animate-bounce"
+                className="w-2 h-2 bg-muted-foreground/60 dark:bg-slate-400 rounded-full animate-bounce"
                 style={{ animationDelay: "0ms" }}
               />
               <span
-                className="w-2 h-2 bg-muted-foreground/60 rounded-full animate-bounce"
+                className="w-2 h-2 bg-muted-foreground/60 dark:bg-slate-400 rounded-full animate-bounce"
                 style={{ animationDelay: "150ms" }}
               />
               <span
-                className="w-2 h-2 bg-muted-foreground/60 rounded-full animate-bounce"
+                className="w-2 h-2 bg-muted-foreground/60 dark:bg-slate-400 rounded-full animate-bounce"
                 style={{ animationDelay: "300ms" }}
               />
             </div>
