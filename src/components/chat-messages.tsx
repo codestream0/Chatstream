@@ -28,7 +28,7 @@ export function ChatMessages({ messages, isTyping, activeContact }: ChatMessages
         >
           {message.sender === "other" && (
             <Avatar className="h-8 w-8 flex-shrink-0 ring-2 ring-border/20 dark:ring-slate-700 shadow-sm">
-              <AvatarImage src={activeContact.avatar || "/placeholder.svg"} />
+              <AvatarImage src={activeContact.avatar} />
               <AvatarFallback className="bg-muted dark:bg-slate-700 text-muted-foreground dark:text-slate-300 text-xs">
                 {activeContact.name.slice(0, 2)}
               </AvatarFallback>
@@ -56,7 +56,7 @@ export function ChatMessages({ messages, isTyping, activeContact }: ChatMessages
       {isTyping && (
         <div className="flex gap-3 animate-slide-up">
           <Avatar className="h-8 w-8 ring-2 ring-border/20 dark:ring-slate-700 shadow-sm">
-            <AvatarImage src={activeContact.avatar || "/placeholder.svg"} />
+            <AvatarImage src={activeContact.avatar} />
             <AvatarFallback className="bg-muted dark:bg-slate-700 text-muted-foreground dark:text-slate-300 text-xs">
               {activeContact.name.slice(0, 2)}
             </AvatarFallback>
