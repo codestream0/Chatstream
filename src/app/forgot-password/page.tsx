@@ -4,6 +4,7 @@ import type React from "react"
 
 import { useState } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -11,9 +12,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ArrowLeft } from "lucide-react"
 
 export default function ForgotPasswordPage() {
+  const Router = useRouter()
   const [email, setEmail] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const [isSubmitted, setIsSubmitted] = useState(false)
+  // const [isSubmitted, setIsSubmitted] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -21,7 +23,7 @@ export default function ForgotPasswordPage() {
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1000))
     setIsLoading(false)
-    setIsSubmitted(true)
+    Router.push('/verify-otp');
   }
 
   return (
@@ -35,16 +37,13 @@ export default function ForgotPasswordPage() {
       <Card className="w-full max-w-md shadow-2xl relative z-10 backdrop-blur-xl bg-white/80 dark:bg-slate-900/80 border-white/20">
         <CardHeader className="space-y-1 text-center">
           <CardTitle className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-            {isSubmitted ? "Check your email" : "Forgot password?"}
+            Forgot password?
           </CardTitle>
           <CardDescription className="text-base">
-            {isSubmitted
-              ? "We've sent a password reset link to your email address"
-              : "Enter your email and we'll send you a reset link"}
+            Enter your email and we'll send you an OTP to reset your password
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {!isSubmitted ? (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
@@ -59,19 +58,9 @@ export default function ForgotPasswordPage() {
                 />
               </div>
               <Button type="submit" className="w-full h-11 text-base" disabled={isLoading}>
-                {isLoading ? "Sending..." : "Send reset link"}
+                {isLoading ? "Sending..." : "Send OTP"}
               </Button>
             </form>
-          ) : (
-            <div className="space-y-4">
-              <div className="rounded-lg bg-primary/10 p-4 text-center text-sm text-primary">
-                If an account exists with {email}, you will receive a password reset email shortly.
-              </div>
-              <Button asChild className="w-full h-11 text-base">
-                <Link href="/login">Return to login</Link>
-              </Button>
-            </div>
-          )}
           <div className="mt-6 text-center">
             <Link
               href="/login"
@@ -86,3 +75,4 @@ export default function ForgotPasswordPage() {
     </main>
   )
 }
+

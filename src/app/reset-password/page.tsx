@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { CheckCircle2 } from "lucide-react"
+import { ArrowLeft, CheckCircle2, Router } from "lucide-react"
 
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState("")
@@ -29,6 +29,7 @@ export default function ResetPasswordPage() {
     await new Promise((resolve) => setTimeout(resolve, 1000))
     setIsLoading(false)
     setIsReset(true)
+    router.push('/chat');
   }
 
   return (
@@ -49,47 +50,44 @@ export default function ResetPasswordPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {!isReset ? (
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="password">New password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Create a new password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="h-11"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm new password</Label>
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  placeholder="Confirm your new password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                  className="h-11"
-                />
-              </div>
-              <Button type="submit" className="w-full h-11 text-base" disabled={isLoading}>
-                {isLoading ? "Resetting..." : "Reset password"}
-              </Button>
-            </form>
-          ) : (
-            <div className="space-y-4">
-              <div className="flex flex-col items-center gap-3 rounded-lg bg-primary/10 p-6 text-center">
-                <CheckCircle2 className="h-12 w-12 text-primary" />
-                <p className="text-sm text-muted-foreground">You can now sign in with your new password</p>
-              </div>
-              <Button asChild className="w-full h-11 text-base">
-                <Link href="/login">Continue to login</Link>
-              </Button>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="password">New password</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Create a new password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="h-11"
+              />
             </div>
-          )}
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirm new password</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                placeholder="Confirm your new password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+                className="h-11"
+              />
+            </div>
+            <Button type="submit" className="w-full h-11 text-base" disabled={isLoading}>
+              {isLoading ? "Resetting..." : "Reset password"}
+            </Button>
+          </form>
+          <div className="mt-6 text-center">
+            <Link
+              href="/login"
+              className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to login
+            </Link>
+          </div>
         </CardContent>
       </Card>
     </main>
