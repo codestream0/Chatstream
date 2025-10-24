@@ -11,19 +11,19 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default function SignupPage() {
-  const [name, setName] = useState("")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
+  const [name,setName]= useState("")
+  const [email,setEmail]= useState("")
+  const [phoneNumber,setPhoneNumber]= useState("")
+  const [password,setPassword]= useState("")
+
+
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
-  const handleSubmit = async (e: React.FormEvent) => {
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if (password !== confirmPassword) {
-      alert("Passwords don't match")
-      return
-    }
+  
     setIsLoading(true)
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1000))
@@ -59,43 +59,48 @@ export default function SignupPage() {
                 required
                 className="h-11"
               />
+
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+             <div className="space-y-2">
+              <Label htmlFor="name">Email</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="name@example.com"
+                placeholder="johndoe@gmail.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 className="h-11"
               />
-            </div>
+
+            </div> 
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="name">Phone Number</Label>
+              <Input
+                id="phoneNumber"
+                type="text"
+                placeholder="080123456789"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                required
+                className="h-11"
+              />
+
+            </div> 
+            <div className="space-y-2">
+              <Label htmlFor="name">Password</Label>
               <Input
                 id="password"
                 type="password"
-                placeholder="Create a password"
+                placeholder="**********"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 className="h-11"
               />
+
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm password</Label>
-              <Input
-                id="confirmPassword"
-                type="password"
-                placeholder="Confirm your password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-                className="h-11"
-              />
-            </div>
+
             <Button type="submit" className="w-full h-11 text-base" disabled={isLoading}>
               {isLoading ? "Creating account..." : "Create account"}
             </Button>
