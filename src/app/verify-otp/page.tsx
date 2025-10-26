@@ -1,8 +1,8 @@
 "use client"
+
 import { useState } from "react"
 import { useId } from "react"
 import { OTPInput, SlotProps } from "input-otp"
-
 import { cn } from "@/lib/utils"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -10,20 +10,24 @@ import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { useVerifyOtpMutation } from "@/features/auth/authApi"
+import { useDispatch,useSelector } from "react-redux"
+import { RootState } from "@/lib/store"
+import { createUser } from "@/features/auth/authSlice"
 
 
 
 export default function verifyOtp(){
     const [otp,setOtp]=useState("");
-    const [isLoading,setIsLoading]=useState(false);
-    const Router=useRouter(); 
+    const [verifyOtp,{isLoading}] = useVerifyOtpMutation();
+    const dispatch = useDispatch()
+    const Router = useRouter();
+    const email = useSelector((state:RootState)=>state.auth.email)
 
-    const handleSubmit=async(e:React.FormEvent)=>{
+    const handleSubmit= async(e:React.FormEvent)=>{
         e.preventDefault();
-        setIsLoading(true);
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        setIsLoading(false);
+        const request = await verifyOtp({otp,email}).unwrap()
+        // dispatch(createUser(request))
         Router.push('/reset-password');
     }
     
@@ -47,7 +51,8 @@ export default function verifyOtp(){
             <form className="space-y-4" onSubmit={handleSubmit}>
             <OtpInput value={otp} onChange={setOtp} /> 
             <Button type="submit" className="w-full h-11 text-base">
-                {isLoading ? "verifying..." : "verify OTP"}
+                {/* {isLoading ? "verifying..." : "verify OTP"} */}
+                verify OTP
             </Button>
             </form>
 

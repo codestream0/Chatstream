@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { logout } from "@/features/auth/authSlice"
 
 interface ChatSidebarProps {
   contacts: Contact[]
@@ -56,7 +57,8 @@ export function ChatSidebar({ contacts, activeChat, onSelectChat, isDarkMode, on
   ])
 
   const handleLogout = () => {
-    router.push("/login")
+    logout()
+    // router.push("/login")
   }
 
   const handleAcceptRequest = (id: string) => {

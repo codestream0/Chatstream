@@ -10,19 +10,24 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowLeft } from "lucide-react"
+import { useDispatch } from "react-redux"
+import { useForgotPasswordMutation } from "@/features/auth/authApi"
+import { createUser } from "@/features/auth/authSlice"
+import { MoonLoader } from "react-spinners"
 
 export default function ForgotPasswordPage() {
   const Router = useRouter()
   const [email, setEmail] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  // const [isSubmitted, setIsSubmitted] = useState(false)
+  // const [isLoading, setIsLoading] = useState(false)
+  const [sendOtp,{isLoading}] = useForgotPasswordMutation()
+  const dispatch = useDispatch()
+  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsLoading(true)
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    setIsLoading(false)
+    const request = await sendOtp(email).unwrap()
+    console.log("sent OTP to the email given:",request)
+    dispatch(createUser(request))
     Router.push('/verify-otp');
   }
 
@@ -57,8 +62,9 @@ export default function ForgotPasswordPage() {
                   className="h-11"
                 />
               </div>
-              <Button type="submit" className="w-full h-11 text-base" disabled={isLoading}>
-                {isLoading ? "Sending..." : "Send OTP"}
+              <Button type="submit" className="w-full h-11 text-base">
+                send OTP
+                <MoonLoader color="white" size={16} loading={isLoading} />
               </Button>
             </form>
           <div className="mt-6 text-center">

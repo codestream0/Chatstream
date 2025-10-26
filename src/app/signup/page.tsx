@@ -9,25 +9,28 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useSignupMutation } from "@/features/auth/authApi"
+import { MoonLoader } from "react-spinners"
+import { createUser } from "@/features/auth/authSlice"
+import { useDispatch } from "react-redux"
 
 export default function SignupPage() {
   const [name,setName]= useState("")
   const [email,setEmail]= useState("")
   const [phoneNumber,setPhoneNumber]= useState("")
   const [password,setPassword]= useState("")
+  const [signup,{isLoading}] = useSignupMutation()
+  const dispatch = useDispatch()
 
 
-  const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-  
-    setIsLoading(true)
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    setIsLoading(false)
+    const request = await signup({fullName:name,email,phoneNumber,password}).unwrap();
+    console.log("Signup successful:", request) 
+    dispatch(createUser(request)) 
     router.push("/chat")
   }
 
@@ -59,7 +62,6 @@ export default function SignupPage() {
                 required
                 className="h-11"
               />
-
             </div>
              <div className="space-y-2">
               <Label htmlFor="name">Email</Label>
@@ -101,8 +103,9 @@ export default function SignupPage() {
 
             </div>
 
-            <Button type="submit" className="w-full h-11 text-base" disabled={isLoading}>
-              {isLoading ? "Creating account..." : "Create account"}
+            <Button type="submit" className="w-full h-11 text-base">
+              create account
+              <MoonLoader size={16} color="white" loading={isLoading} />
             </Button>
           </form>
           <div className="mt-6 text-center text-sm">

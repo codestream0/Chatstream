@@ -1,28 +1,38 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useDispatch } from "react-redux"
+import { useLoginMutation } from "@/features/auth/authApi"
+import { createUser } from "@/features/auth/authSlice"
+import { MoonLoader } from "react-spinners"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState("")
+  const [login,{isLoading}] = useLoginMutation()
   const router = useRouter()
+  const dispatch = useDispatch()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsLoading(true)
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    setIsLoading(false)
-    router.push("/chat")
+    try {
+      const request = await login({email,password}).unwrap()
+      console.log("login successfull:", request);
+      dispatch(createUser(request))
+    } catch (error) {
+      setErrorMessage("Invalid email or password")
+      console.error("Login failed:", error)
+    }
+    
+      router.push("/chat")
   }
 
   return (
@@ -71,8 +81,10 @@ export default function LoginPage() {
                 className="h-11"
               />
             </div>
-            <Button type="submit" className="w-full h-11 text-base" disabled={isLoading}>
-              {isLoading ? "Signing in..." : "Sign in"}
+            {errorMessage && <p className="text-sm text-red-600">{errorMessage}</p>}  
+            <Button type="submit" className="w-full h-11 text-base">
+              Login
+              <MoonLoader size={16} color="white" loading={isLoading} />
             </Button>
           </form>
           <div className="mt-6 text-center text-sm">
