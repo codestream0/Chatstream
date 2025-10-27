@@ -20,7 +20,7 @@ export const authApi = api.injectEndpoints({
 
         forgotPassword:builder.mutation({
             query:(email:string)=>({
-                url:'/auth/forgot-password',
+                url:'/auth/forgotPassword',
                 method:'POST',
                 body:{email},
             }),
@@ -28,7 +28,7 @@ export const authApi = api.injectEndpoints({
 
         verifyOtp:builder.mutation({
             query:(data:{email:string,otp:string})=>({
-                url:'/auth/verify-otp',
+                url:'/auth/verifyOtp',
                 method:'POST',
                 body:data,
             }),

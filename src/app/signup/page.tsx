@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState,useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -13,25 +13,51 @@ import { useSignupMutation } from "@/features/auth/authApi"
 import { MoonLoader } from "react-spinners"
 import { createUser } from "@/features/auth/authSlice"
 import { useDispatch } from "react-redux"
+import { toast } from "react-toastify"
 
 export default function SignupPage() {
   const [name,setName]= useState("")
   const [email,setEmail]= useState("")
   const [phoneNumber,setPhoneNumber]= useState("")
   const [password,setPassword]= useState("")
+  
   const [signup,{isLoading}] = useSignupMutation()
   const dispatch = useDispatch()
-
-
   const router = useRouter()
 
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    const request = await signup({fullName:name,email,phoneNumber,password}).unwrap();
-    console.log("Signup successful:", request) 
-    dispatch(createUser(request)) 
-    router.push("/chat")
+
+    try {
+      const request = await signup({fullName:name,email,phoneNumber,password}).unwrap();
+      console.log("Signup successful:", request) 
+      dispatch(createUser(request)) 
+
+      if(request.status === 400 || request.message === "email already exists" ){
+        toast.error("User already signin with this email")
+      }else if(request.status === 409){
+        toast.error("User already exists. Please login.")
+      }else{
+      toast.success("Signup successful! Redirecting to chat...")
+      router.push("/chat")
+
+      }
+
+    } catch (err:any) {
+      console.error("Signup failed:", err)
+        const status = err?.status ?? err?.originalStatus
+      const dataMessage = err?.data?.message ?? err?.data ?? err?.message
+
+      if (status === 409) {
+        toast.error("Email already exists. Please try logging in.")
+      } else if (typeof dataMessage === "string" && dataMessage.length > 0) {
+        toast.error(dataMessage)
+      } else {
+        toast.error("Signup failed. Please try again.")
+      }
+    }
+
   }
 
   return (
@@ -102,7 +128,6 @@ export default function SignupPage() {
               />
 
             </div>
-
             <Button type="submit" className="w-full h-11 text-base">
               create account
               <MoonLoader size={16} color="white" loading={isLoading} />

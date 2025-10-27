@@ -10,25 +10,38 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowLeft } from "lucide-react"
-import { useDispatch } from "react-redux"
 import { useForgotPasswordMutation } from "@/features/auth/authApi"
-import { createUser } from "@/features/auth/authSlice"
 import { MoonLoader } from "react-spinners"
+import {toast} from "react-toastify"
+
 
 export default function ForgotPasswordPage() {
   const Router = useRouter()
   const [email, setEmail] = useState("")
-  // const [isLoading, setIsLoading] = useState(false)
+
   const [sendOtp,{isLoading}] = useForgotPasswordMutation()
-  const dispatch = useDispatch()
   
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    const request = await sendOtp(email).unwrap()
-    console.log("sent OTP to the email given:",request)
-    dispatch(createUser(request))
-    Router.push('/verify-otp');
+    try {
+      const request = await sendOtp(email).unwrap()
+      console.log("sent OTP to the email given:",request)
+      if(request.status === 401){
+        toast.error("These email does not exists")
+      }else{
+        toast.success("An otp is sent successfully")
+        Router.push(`/verify-otp?email=${encodeURIComponent(email)}`);
+      }
+    } catch (err:any) {
+      console.error("error:",err)
+      const status = err?.status ?? err?.originalStatus
+      if(status === 400){
+        toast.error("invalid credentials,please try again")
+      }
+
+    }
+
   }
 
   return (
@@ -55,7 +68,7 @@ export default function ForgotPasswordPage() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="name@example.com"
+                  placeholder="johndoe@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required

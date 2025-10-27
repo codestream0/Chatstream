@@ -11,24 +11,41 @@ import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useVerifyOtpMutation } from "@/features/auth/authApi"
-import { useDispatch,useSelector } from "react-redux"
-import { RootState } from "@/lib/store"
-import { createUser } from "@/features/auth/authSlice"
-
+import { MoonLoader } from "react-spinners"
+import { toast } from "react-toastify"
+import { useSearchParams } from "next/navigation"
 
 
 export default function verifyOtp(){
     const [otp,setOtp]=useState("");
     const [verifyOtp,{isLoading}] = useVerifyOtpMutation();
-    const dispatch = useDispatch()
-    const Router = useRouter();
-    const email = useSelector((state:RootState)=>state.auth.email)
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const email = searchParams.get("email") || "";
+
+
+console.log("email in otp page:",email);
+console.log("otp value:",otp);
 
     const handleSubmit= async(e:React.FormEvent)=>{
-        e.preventDefault();
-        const request = await verifyOtp({otp,email}).unwrap()
-        // dispatch(createUser(request))
-        Router.push('/reset-password');
+      e.preventDefault()
+        try {
+        const request = await verifyOtp({ otp, email }).unwrap()
+        console.log("verification successful",request);
+toast.success("OTP verified successfully")
+        router.push("/reset-password")
+      } catch (error: any) {
+        console.error("OTP verification failed:", error)
+        if (error?.status === 400) {
+          toast.error("Bad request — please check the OTP and try again.")
+        } else if (error?.status === 401) {
+          toast.error("Invalid or expired OTP. Please try again.")
+        } else if (error?.data?.message) {
+          toast.error(error.data.message)
+        } else {
+          toast.error("Something went wrong. Please try again later.")
+        }
+      }
     }
     
   return(
@@ -50,9 +67,16 @@ export default function verifyOtp(){
         <CardContent>
             <form className="space-y-4" onSubmit={handleSubmit}>
             <OtpInput value={otp} onChange={setOtp} /> 
-            <Button type="submit" className="w-full h-11 text-base">
-                {/* {isLoading ? "verifying..." : "verify OTP"} */}
-                verify OTP
+            <Button type="submit" className="w-full h-11 text-base" disabled={isLoading}>
+              {isLoading ?(
+                <div className="flex items-center gap-2 justify-center">
+                  <MoonLoader size={16} color="white" loading={isLoading} />
+                  <span>verifying </span>
+                </div>
+              ):(
+                "verify OTP"
+              )}
+                
             </Button>
             </form>
 

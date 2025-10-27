@@ -1,25 +1,34 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useDispatch } from "react-redux"
+import { useDispatch,useSelector } from "react-redux"
 import { useLoginMutation } from "@/features/auth/authApi"
 import { createUser } from "@/features/auth/authSlice"
 import { MoonLoader } from "react-spinners"
+import { RootState } from "@/lib/store"
+import { toast } from "react-toastify"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [errorMessage, setErrorMessage] = useState("")
+
   const [login,{isLoading}] = useLoginMutation()
   const router = useRouter()
   const dispatch = useDispatch()
+  const user = useSelector((state:RootState)=>state.auth)
+
+  useEffect(()=>{
+    if(user.accessToken){
+      router.push("/chat")
+    }
+  }, [user,router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -27,12 +36,24 @@ export default function LoginPage() {
       const request = await login({email,password}).unwrap()
       console.log("login successfull:", request);
       dispatch(createUser(request))
-    } catch (error) {
-      setErrorMessage("Invalid email or password")
-      console.error("Login failed:", error)
+      request.status ===401 ? toast.error("Invalid email or password. Please try again.") :
+      toast.success("Login successful! Redirecting to chat...")
+      
+    } catch (err:any) {
+
+      // console.error("Login failed:", err)
+      const status = err?.status ?? err?.originalStatus
+      const dataMessage = err?.data?.message ?? err?.data ?? err?.message
+
+      if (status === 401) {
+        toast.error("Invalid email or password. Please try again.")
+      } else if (typeof dataMessage === "string" && dataMessage.length > 0) {
+        toast.error(dataMessage)
+      } else {
+        toast.error("Login failed. Please try again.")
+      }
+
     }
-    
-      router.push("/chat")
   }
 
   return (
@@ -80,11 +101,16 @@ export default function LoginPage() {
                 required
                 className="h-11"
               />
-            </div>
-            {errorMessage && <p className="text-sm text-red-600">{errorMessage}</p>}  
-            <Button type="submit" className="w-full h-11 text-base">
-              Login
-              <MoonLoader size={16} color="white" loading={isLoading} />
+            </div> 
+            <Button type="submit" className="w-full h-11 text-base" >
+              {isLoading ? (
+                <div className="flex items-center gap-2 justify-center">
+                  <MoonLoader size={16} color="white" loading={isLoading} />
+                  <span>Logging in...</span>
+                </div>
+              ) : (
+                "Login"
+              )}
             </Button>
           </form>
           <div className="mt-6 text-center text-sm">
