@@ -26,13 +26,17 @@ export default function verifyOtp(){
 
 console.log("email in otp page:",email);
 console.log("otp value:",otp);
-
+localStorage.setItem("emailForOtp",email);
+localStorage.setItem("otpValue",otp);
     const handleSubmit= async(e:React.FormEvent)=>{
       e.preventDefault()
         try {
         const request = await verifyOtp({ otp, email }).unwrap()
         console.log("verification successful",request);
-toast.success("OTP verified successfully")
+        if(request.status === 401){
+
+        }
+        toast.success("OTP verified successfully")
         router.push("/reset-password")
       } catch (error: any) {
         console.error("OTP verification failed:", error)
