@@ -15,9 +15,15 @@ import {
 } from "./ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { logout } from "@/features/auth/authSlice"
+import { useDispatch, useSelector } from "react-redux"
+import type { RootState } from "@/lib/store"
+import {useSendFriendRequestsMutation,useSearchFriendsQuery} from "@/features/friendRequest/friendRequestApi";
+import { toast } from "react-toastify"
+import { MoonLoader } from "react-spinners"
+
 
 interface ChatSidebarProps {
   contacts: Contact[]
@@ -42,7 +48,29 @@ interface Notification {
 }
 
 export function ChatSidebar({ contacts, activeChat, onSelectChat, isDarkMode, onToggleDarkMode }: ChatSidebarProps) {
-  const router = useRouter()
+  const dispatch = useDispatch()
+  const fullName = useSelector((state: RootState) => state.auth?.fullName ?? "codestream")
+  console.log("fullName:", fullName)
+  const [query,setQuery] = useState("")
+  
+  const {data:friends=[], isFetching}= useSearchFriendsQuery(query,{
+    skip: !query.trim(),
+  })
+
+  const [sendFriendRequest,{isLoading:sending}] = useSendFriendRequestsMutation()
+
+  const handleAddFriend = async ( receiverId:string )=>{
+    try {
+      await sendFriendRequest({receiverId}).unwrap()
+      toast.success("friend request sent successfully")
+
+    } catch (err:any) {
+      console.log(err);
+    }
+
+
+  }
+  
 
   const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([
     { id: "1", name: "Alex Johnson", avatar: "/alex.png?height=40&width=40", mutualFriends: 5 },
@@ -56,10 +84,10 @@ export function ChatSidebar({ contacts, activeChat, onSelectChat, isDarkMode, on
     { id: "3", message: "Emma Davis is now online", timestamp: "10m ago", read: true },
   ])
 
-  const handleLogout = () => {
-    logout()
-    // router.push("/login")
-  }
+  // const handleLogout = () => {
+  //   logout()
+  //   // router.push("/login")
+  // }
 
   const handleAcceptRequest = (id: string) => {
     setFriendRequests(friendRequests.filter((req) => req.id !== id))
@@ -224,7 +252,7 @@ export function ChatSidebar({ contacts, activeChat, onSelectChat, isDarkMode, on
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="dark:bg-slate-700" />
                 <DropdownMenuItem
-                  onClick={handleLogout}
+                  onClick={()=>dispatch(logout())}
                   className="cursor-pointer dark:hover:bg-slate-700 text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400"
                 >
                   <LogOut className="h-4 w-4 mr-2" />
@@ -237,14 +265,37 @@ export function ChatSidebar({ contacts, activeChat, onSelectChat, isDarkMode, on
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground dark:text-slate-400" />
           <Input
-            placeholder="Search conversations..."
+            type="text"
+            placeholder="Search friends..."
             className="pl-9 bg-background/50 dark:bg-slate-800/50 border-border/50 dark:border-slate-700 focus-visible:ring-2 focus-visible:ring-ring/50 dark:focus-visible:ring-primary/50 rounded-xl dark:text-white dark:placeholder:text-slate-500"
+            value={query}
+            onChange={(e)=>setQuery(e.target.value)}
           />
         </div>
       </div>
 
       {/* Contacts List */}
       <div className="flex-1 overflow-y-auto custom-scrollbar">
+        {isFetching && (<MoonLoader size={16} color="black"/>)}
+        {friends?.length > 0 && (
+          <ul className="px-2 py-2">
+            {friends.map((friend:any) => (
+            <li key={friend._id} className="flex items-center justify-between p-2 mb-2 bg-gray-200  dark:bg-gray-400 rounded-md">
+              <div>
+                <p className="font-medium">{friend.fullName}</p>
+                <p className="text-xs text-gray-500">{friend.email}</p>
+              </div>
+              <button
+                className="bg-blue-500 text-white px-3 py-1 rounded-md"
+                disabled={sending}
+                onClick={() => handleAddFriend(friend._id)}
+              >
+                Add
+              </button>
+            </li>
+          ))}
+          </ul>
+        )}
         {contacts.map((contact) => (
           <button
             key={contact.id}

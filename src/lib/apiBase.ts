@@ -38,6 +38,6 @@ export const api = createApi({
       return headers;
     },
   }),
-  tagTypes: ["friends", "chats", "messages", "users"],
+  tagTypes: ["friends", "messages", "users"],
   endpoints: () => ({}),
 });

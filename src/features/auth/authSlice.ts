@@ -25,7 +25,13 @@ const authSlice = createSlice({
       return { ...state, ...action.payload };
     },
     logout: (state) => {
-      return initialState;
+      return{
+        fullName: "",
+        email: "",
+        phoneNumber: "",
+        accessToken: null,
+        refreshToken: null,
+      };
     },
   },
 });

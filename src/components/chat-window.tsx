@@ -175,7 +175,7 @@ const messagesByContact: Record<string, Message[]> = {
 export function ChatWindow() {
   const [allMessages, setAllMessages] = useState<Record<string, Message[]>>(messagesByContact)
   const [isTyping, setIsTyping] = useState(false)
-  const [isChatOpen, setIsChatOpen] = useState(true)
+  const [isChatOpen, setIsChatOpen] = useState(false)
   const [activeChat, setActiveChat] = useState("1")
   const [isDarkMode, setIsDarkMode] = useState(false)
 
