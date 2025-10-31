@@ -20,7 +20,7 @@ import { useState } from "react";
 import { logout } from "@/features/auth/authSlice"
 import { useDispatch, useSelector } from "react-redux"
 import type { RootState } from "@/lib/store"
-import {useSendFriendRequestsMutation,useSearchFriendsQuery} from "@/features/friendRequest/friendRequestApi";
+import {useSendFriendRequestsMutation,useSearchFriendsQuery, useGetFriendRequestsQuery} from "@/features/friendRequest/friendRequestApi";
 import { toast } from "react-toastify"
 import { MoonLoader } from "react-spinners"
 
@@ -58,6 +58,10 @@ export function ChatSidebar({ contacts, activeChat, onSelectChat, isDarkMode, on
   })
 
   const [sendFriendRequest,{isLoading:sending}] = useSendFriendRequestsMutation()
+  const {data:friendRequests=[]} = useGetFriendRequestsQuery()
+  // const [respond]
+  console.log(friendRequests);
+  
 
   const handleAddFriend = async ( receiverId:string )=>{
     try {
@@ -67,16 +71,8 @@ export function ChatSidebar({ contacts, activeChat, onSelectChat, isDarkMode, on
     } catch (err:any) {
       console.log(err);
     }
-
-
   }
-  
 
-  const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([
-    { id: "1", name: "Alex Johnson", avatar: "/alex.png?height=40&width=40", mutualFriends: 5 },
-    { id: "2", name: "Maria Garcia", avatar: "/pics.png?height=40&width=40", mutualFriends: 3 },
-    { id: "3", name: "James Wilson", avatar: "/alex.png?height=40&width=40", mutualFriends: 8 },
-  ])
 
   const [notifications, setNotifications] = useState<Notification[]>([
     { id: "1", message: "Sarah Chen accepted your friend request", timestamp: "2m ago", read: false },
@@ -90,11 +86,11 @@ export function ChatSidebar({ contacts, activeChat, onSelectChat, isDarkMode, on
   // }
 
   const handleAcceptRequest = (id: string) => {
-    setFriendRequests(friendRequests.filter((req) => req.id !== id))
+    // setFriendRequests(friendRequests.filter((req) => req.id !== id))
   }
 
   const handleRejectRequest = (id: string) => {
-    setFriendRequests(friendRequests.filter((req) => req.id !== id))
+    // setFriendRequests(friendRequests.filter((req) => req.id !== id))
   }
 
   const handleMarkAsRead = (id: string) => {
@@ -134,22 +130,22 @@ export function ChatSidebar({ contacts, activeChat, onSelectChat, isDarkMode, on
                     No pending friend requests
                   </div>
                 ) : (
-                  friendRequests.map((request) => (
+                  friendRequests.map((request:any) => (
                     <div
-                      key={request.id}
+                      key={request._id}
                       className="p-3 hover:bg-accent/50 dark:hover:bg-slate-700/50 border-b border-border/20 dark:border-slate-700/30 last:border-0"
                     >
                       <div className="flex items-center gap-3 mb-2">
                         <Avatar className="h-10 w-10">
-                          <AvatarImage src={request.avatar} alt={request.name} />
+                          {/* <AvatarImage src={request.avatar} alt={request.name} /> */}
                           <AvatarFallback className="dark:bg-slate-700 dark:text-slate-300">
-                            {request.name.slice(0, 2)}
+                            {request.senderId.fullName.slice(0, 2)}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1">
-                          <p className="font-semibold text-sm dark:text-white">{request.name}</p>
+                          <p className="font-semibold text-sm dark:text-white">{request.senderId.fullName}</p>
                           <p className="text-xs text-muted-foreground dark:text-slate-400">
-                            {request.mutualFriends} mutual friends
+                            {request.senderId.email} 
                           </p>
                         </div>
                       </div>
@@ -281,17 +277,23 @@ export function ChatSidebar({ contacts, activeChat, onSelectChat, isDarkMode, on
           <ul className="px-2 py-2">
             {friends.map((friend:any) => (
             <li key={friend._id} className="flex items-center justify-between p-2 mb-2 bg-gray-200  dark:bg-gray-400 rounded-md">
+            <Avatar className="h-10 w-10">
+                {/* <AvatarImage src={request.avatar} alt={request.name} /> */}
+                <AvatarFallback className="dark:bg-slate-700 dark:text-slate-300">
+                  {friend.fullName.slice(0, 2)}
+                </AvatarFallback>
+              </Avatar>
               <div>
                 <p className="font-medium">{friend.fullName}</p>
                 <p className="text-xs text-gray-500">{friend.email}</p>
               </div>
-              <button
-                className="bg-blue-500 text-white px-3 py-1 rounded-md"
+              <Button
+                className="bg-blue-800 hover:bg-blue-950 text-white px-3 py-1 rounded-md"
                 disabled={sending}
                 onClick={() => handleAddFriend(friend._id)}
               >
                 Add
-              </button>
+              </Button>
             </li>
           ))}
           </ul>

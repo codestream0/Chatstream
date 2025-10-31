@@ -20,7 +20,7 @@ export const friendRequestApi = api.injectEndpoints({
             })
         }),
 
-        getFriendRequests:builder.query({
+        getFriendRequests:builder.query<any,void>({
             query: ()=> "/friends/pending"
         }),
 

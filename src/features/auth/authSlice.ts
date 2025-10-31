@@ -21,8 +21,8 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    createUser: (state, action: PayloadAction<AuthState>) => {
-      return { ...state, ...action.payload };
+    createUser: (state, action: PayloadAction<Partial<AuthState>>) => {
+     Object.assign(state, action.payload);
     },
     logout: (state) => {
       return{
