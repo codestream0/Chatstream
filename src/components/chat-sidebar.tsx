@@ -33,12 +33,6 @@ interface ChatSidebarProps {
   onToggleDarkMode: () => void
 }
 
-interface FriendRequest {
-  id: string
-  name: string
-  avatar: string
-  mutualFriends: number
-}
 
 interface Notification {
   id: string
@@ -63,9 +57,10 @@ export function ChatSidebar({ contacts, activeChat, onSelectChat, isDarkMode, on
   console.log(friendRequests);
   
 
-  const handleAddFriend = async ( receiverId:string )=>{
+  const handleAddFriend = async ( friend:any )=>{
     try {
-      await sendFriendRequest({receiverId}).unwrap()
+      const payload = friend._id ? {receiverId : friend._id}:{receiverEmail:friend.email}
+      await  sendFriendRequest(payload);
       toast.success("friend request sent successfully")
 
     } catch (err:any) {
@@ -276,23 +271,23 @@ export function ChatSidebar({ contacts, activeChat, onSelectChat, isDarkMode, on
         {friends?.length > 0 && (
           <ul className="px-2 py-2">
             {friends.map((friend:any) => (
-            <li key={friend._id} className="flex items-center justify-between p-2 mb-2 bg-gray-200  dark:bg-gray-400 rounded-md">
+            <li key={friend._id || friend.email } className="flex items-center justify-between p-2 mb-2 bg-gray-200  dark:bg-gray-400 rounded-md">
             <Avatar className="h-10 w-10">
                 {/* <AvatarImage src={request.avatar} alt={request.name} /> */}
                 <AvatarFallback className="dark:bg-slate-700 dark:text-slate-300">
-                  {friend.fullName.slice(0, 2)}
+                  {friend.fullName?.slice(0, 2) || friend.email?.slice(0,2) }
                 </AvatarFallback>
               </Avatar>
               <div>
-                <p className="font-medium">{friend.fullName}</p>
+                <p className="font-medium">{friend.fullName || "unknown"}</p>
                 <p className="text-xs text-gray-500">{friend.email}</p>
               </div>
               <Button
                 className="bg-blue-800 hover:bg-blue-950 text-white px-3 py-1 rounded-md"
                 disabled={sending}
-                onClick={() => handleAddFriend(friend._id)}
+                onClick={() => handleAddFriend(friend)}
               >
-                Add
+                Add friend
               </Button>
             </li>
           ))}
