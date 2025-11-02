@@ -32,7 +32,14 @@ export default function SignupPage() {
     try {
       const request = await signup({fullName:name,email,phoneNumber,password}).unwrap();
       console.log("Signup successful:", request) 
-      dispatch(createUser(request)) 
+      const dispatchUser={
+        fullName:request.user?.userWithoutPassword?.fullName,
+        email:request.user?.userWithoutPassword?.email,
+        phoneNumber:request.user?.userWithoutPassword?.phoneNumber,
+        accessToken:request.accessToken,
+        refreshToken:request.refreshToken,
+      }
+      dispatch(createUser(dispatchUser)) 
 
       if(request.status === 400 || request.message === "email already exists" ){
         toast.error("User already signin with this email")

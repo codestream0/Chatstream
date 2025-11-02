@@ -20,7 +20,7 @@ import { useState } from "react";
 import { logout } from "@/features/auth/authSlice"
 import { useDispatch, useSelector } from "react-redux"
 import type { RootState } from "@/lib/store"
-import {useSendFriendRequestsMutation,useSearchFriendsQuery, useGetFriendRequestsQuery} from "@/features/friendRequest/friendRequestApi";
+import {useSendFriendRequestsMutation,useSearchFriendsQuery, useGetFriendRequestsQuery, useRespondFriendRequestsMutation, useGetFriendsQuery} from "@/features/friendRequest/friendRequestApi";
 import { toast } from "react-toastify"
 import { MoonLoader } from "react-spinners"
 
@@ -31,6 +31,7 @@ interface ChatSidebarProps {
   onSelectChat: (chatId: string) => void
   isDarkMode: boolean
   onToggleDarkMode: () => void
+  // request:any;
 }
 
 
@@ -45,6 +46,8 @@ export function ChatSidebar({ contacts, activeChat, onSelectChat, isDarkMode, on
   const dispatch = useDispatch()
   const fullName = useSelector((state: RootState) => state.auth?.fullName ?? "codestream")
   console.log("fullName:", fullName)
+
+
   const [query,setQuery] = useState("")
   
   const {data:friends=[], isFetching}= useSearchFriendsQuery(query,{
@@ -53,20 +56,64 @@ export function ChatSidebar({ contacts, activeChat, onSelectChat, isDarkMode, on
 
   const [sendFriendRequest,{isLoading:sending}] = useSendFriendRequestsMutation()
   const {data:friendRequests=[]} = useGetFriendRequestsQuery()
-  // const [respond]
-  console.log(friendRequests);
+  const [respondFriendRequest,{isLoading}]= useRespondFriendRequestsMutation()
+  const {data:getFriends=[]} = useGetFriendsQuery()
+
   
 
-  const handleAddFriend = async ( friend:any )=>{
-    try {
-      const payload = friend._id ? {receiverId : friend._id}:{receiverEmail:friend.email}
-      await  sendFriendRequest(payload);
-      toast.success("friend request sent successfully")
+const handleAddFriend = async (friend: any) => {
+  try {
+    const payload = friend._id 
+      ? { receiverId: friend._id } 
+      : { receiverEmail: friend.email };
 
-    } catch (err:any) {
-      console.log(err);
+    const response = await sendFriendRequest(payload).unwrap();
+
+    console.log(response);
+    toast.success("Friend request sent successfully");
+  } catch (err: any) {
+    console.error("Error sending friend request:", err);
+
+    const status = err?.status ?? err?.originalStatus;
+    const errorMessage = err?.data?.message ?? err?.message ?? "Friend request failed";
+
+    if (status === 400 && errorMessage.toLowerCase().includes("already")) {
+      toast.error("Friend request has already been sent");
+    } else if (status === 404 && errorMessage.toLowerCase().includes("user not found")) {
+      toast.error("User not found. Please check the email or ID");
+    } else if (typeof errorMessage === "string" && errorMessage.length > 0) {
+      toast.error(errorMessage);
+    } else {
+      toast.error("Something went wrong. Please try again");
     }
   }
+};
+
+
+ const handleRespondFriendRequest = async (request: any, status: "accepted" | "rejected") => {
+  try {
+    await respondFriendRequest({ requestId: request._id, status }).unwrap();
+
+    toast.success(`Friend request ${status} successfully`);
+    console.log(`Friend request ${status} successfully`);
+  } catch (err: any) {
+    console.error("Error responding to friend request:", err);
+
+    const statusCode = err?.status ?? err?.originalStatus;
+    const errorMessage = err?.data?.message ?? err?.message ?? "Failed to process friend request";
+
+    if (statusCode === 400 && errorMessage.toLowerCase().includes("already")) {
+      toast.error(`This friend request has already been ${status} `);
+    } else if (statusCode === 404) {
+      toast.error("Friend request not found or invalid");
+    } else if (typeof errorMessage === "string" && errorMessage.length > 0) {
+      toast.error(errorMessage);
+    } else {
+      toast.error("Something went wrong. Please try again");
+    }
+  }
+};
+
 
 
   const [notifications, setNotifications] = useState<Notification[]>([
@@ -80,14 +127,6 @@ export function ChatSidebar({ contacts, activeChat, onSelectChat, isDarkMode, on
   //   // router.push("/login")
   // }
 
-  const handleAcceptRequest = (id: string) => {
-    // setFriendRequests(friendRequests.filter((req) => req.id !== id))
-  }
-
-  const handleRejectRequest = (id: string) => {
-    // setFriendRequests(friendRequests.filter((req) => req.id !== id))
-  }
-
   const handleMarkAsRead = (id: string) => {
     setNotifications(notifications.map((notif) => (notif.id === id ? { ...notif, read: true } : notif)))
   }
@@ -99,7 +138,7 @@ export function ChatSidebar({ contacts, activeChat, onSelectChat, isDarkMode, on
       {/* Header */}
       <div className="p-5 border-b border-border/30 dark:border-slate-700/50">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-semibold text-foreground dark:text-white">Chatstream</h2>
+          <h2 className="text-2xl font-semibold text-foreground dark:text-white">Chatstream </h2>
           <div className="flex items-center gap-1">
             {/* Friend Requests Button */}
             <DropdownMenu>
@@ -145,14 +184,19 @@ export function ChatSidebar({ contacts, activeChat, onSelectChat, isDarkMode, on
                         </div>
                       </div>
                       <div className="flex gap-2">
-                        <Button size="sm" className="flex-1 h-8" onClick={() => handleAcceptRequest(request.id)}>
+                        <Button 
+                          size="sm" 
+                          className="flex-1 h-8"
+                          disabled={isLoading}
+                          onClick={() => handleRespondFriendRequest(request,"accepted")}>
                           Accept
                         </Button>
                         <Button
                           size="sm"
                           variant="outline"
+                          disabled={isLoading}
                           className="flex-1 h-8 dark:border-slate-600 dark:hover:bg-slate-700 bg-transparent"
-                          onClick={() => handleRejectRequest(request.id)}
+                          onClick={() => handleRespondFriendRequest(request,"rejected")}
                         >
                           Reject
                         </Button>
@@ -283,7 +327,8 @@ export function ChatSidebar({ contacts, activeChat, onSelectChat, isDarkMode, on
                 <p className="text-xs text-gray-500">{friend.email}</p>
               </div>
               <Button
-                className="bg-blue-800 hover:bg-blue-950 text-white px-3 py-1 rounded-md"
+                size="sm"
+                className="flex-1 h-8"
                 disabled={sending}
                 onClick={() => handleAddFriend(friend)}
               >
@@ -293,40 +338,40 @@ export function ChatSidebar({ contacts, activeChat, onSelectChat, isDarkMode, on
           ))}
           </ul>
         )}
-        {contacts.map((contact) => (
+        {getFriends.map((friend:any) => (
           <button
-            key={contact.id}
-            onClick={() => onSelectChat(contact.id)}
+            key={friend._id}
+            onClick={() => onSelectChat(friend._id)}
             className={cn(
               "w-full p-4 flex items-start gap-3 hover:bg-accent/50 dark:hover:bg-slate-800/50 transition-all elegant-hover border-b border-border/20 dark:border-slate-700/30",
-              activeChat === contact.id && "bg-accent/70 dark:bg-slate-800/70",
+              activeChat === friend._id && "bg-accent/70 dark:bg-slate-800/70",
             )}
           >
             <div className="relative">
               <Avatar className="h-12 w-12 ring-2 ring-border/30 dark:ring-slate-700">
-                <AvatarImage src={contact.avatar} alt={contact.name} />
+                {/* <AvatarImage src={contact.avatar} alt={contact.name} /> */}
                 <AvatarFallback className="bg-muted dark:bg-slate-700 text-muted-foreground dark:text-slate-300">
-                  {contact.name.slice(0, 2)}
+                  {getFriends.fullName?.slice(0, 2)}
                 </AvatarFallback>
               </Avatar>
-              {contact.online && (
+              {/* {contact.online && (
                 <span className="absolute bottom-0 right-0 h-3.5 w-3.5 bg-green-500 rounded-full border-2 border-background dark:border-slate-900 shadow-sm" />
-              )}
+              )} */}
             </div>
             <div className="flex-1 text-left min-w-0">
               <div className="flex items-center justify-between mb-1">
-                <h3 className="font-semibold text-sm text-foreground dark:text-white truncate">{contact.name}</h3>
+                <h3 className="font-semibold text-sm text-foreground dark:text-white truncate">{friend.fullName}</h3>
                 <span className="text-xs text-muted-foreground dark:text-slate-400 flex-shrink-0 ml-2">
-                  {contact.timestamp}
+                  {/* {contact.timestamp} */}
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <p className="text-sm text-muted-foreground dark:text-slate-400 truncate">{contact.lastMessage}</p>
-                {contact.unread && (
+                <p className="text-sm text-muted-foreground dark:text-slate-400 truncate">{friend.email}</p>
+                {/* {contact.unread && (
                   <span className="flex-shrink-0 ml-2 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold shadow-md">
                     {contact.unread}
                   </span>
-                )}
+                )} */}
               </div>
             </div>
           </button>

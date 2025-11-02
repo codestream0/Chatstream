@@ -7,6 +7,7 @@ interface AuthState{
   phoneNumber:string,
   accessToken:string | null
   refreshToken:string | null,
+
 }
 
 const initialState: AuthState = {
@@ -15,6 +16,7 @@ const initialState: AuthState = {
   phoneNumber: "",
   accessToken: null,
   refreshToken: null,
+
 };
 
 const authSlice = createSlice({

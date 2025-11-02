@@ -3,7 +3,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { store } from "@/lib/store";
+import { store,persistor } from "@/lib/store";
+import { PersistGate } from "redux-persist/integration/react";
 import { Provider } from "react-redux";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
@@ -34,7 +35,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Provider store={store}>{children}</Provider>
+        <Provider store={store}>
+          <PersistGate loading={null} persistor={persistor} >
+            {children}
+          </PersistGate>
+        </Provider>
          <ToastContainer 
           position="top-right" 
           theme="colored"

@@ -13,11 +13,12 @@ export const friendRequestApi = api.injectEndpoints({
         }),
 
         respondFriendRequests:builder.mutation({
-            query:(credentials:{status:string})=>({
-                url:"/friends/respond/:id",
+            query:({status,requestId})=>({
+                url:`/friends/respond/${requestId}`,
                 method:"PATCH",
-                body:credentials
-            })
+                body:{status}
+            }),
+            invalidatesTags:["friends"]
         }),
 
         getFriendRequests:builder.query<any,void>({
@@ -26,13 +27,14 @@ export const friendRequestApi = api.injectEndpoints({
 
         searchFriends:builder.query({
             query:(query)=> `/friends/search?query=${encodeURIComponent(query)}`,
+        }),
+
+        getFriends:builder.query<any,void>({
+            query:()=> "/friends/getFriends"
         })
 
-        // sent:builder.query({
-        //     query:()=> "/friends/sent"
-        // })
 
     })
 })
 
-export const {useSendFriendRequestsMutation,useSearchFriendsQuery,useRespondFriendRequestsMutation,useGetFriendRequestsQuery} = friendRequestApi;
+export const {useSendFriendRequestsMutation,useSearchFriendsQuery,useRespondFriendRequestsMutation,useGetFriendRequestsQuery,useGetFriendsQuery} = friendRequestApi;

@@ -24,6 +24,7 @@ export default function LoginPage() {
   const dispatch = useDispatch()
   const user = useSelector((state:RootState)=>state.auth)
 
+
   useEffect(()=>{
     if(user.accessToken){
       router.push("/chat")
@@ -35,7 +36,14 @@ export default function LoginPage() {
     try {
       const request = await login({email,password}).unwrap()
       console.log("login successfull:", request);
-      dispatch(createUser(request))
+      const dispatchUser={
+        fullName:request.user?.fullName,
+        email:request.user?.email,
+        phoneNumber:request.user?.phoneNumber,
+        accessToken:request.accessToken,
+        refreshToken:request.refreshToken,
+      }
+      dispatch(createUser(dispatchUser))
       request.status ===401 ? toast.error("Invalid email or password. Please try again.") :
       toast.success("Login successful! Redirecting to chat...")
       
