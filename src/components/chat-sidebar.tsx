@@ -310,7 +310,7 @@ const handleAddFriend = async (friend: any) => {
       </div>
 
       {/* Contacts List */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar">
+      <div className="flex-1 overflow-y-auto custom-scrollbar min-h-96 ">
         {isFetching && (<MoonLoader size={16} color="black"/>)}
         {friends?.length > 0 && (
           <ul className="px-2 py-2">
@@ -338,7 +338,8 @@ const handleAddFriend = async (friend: any) => {
           ))}
           </ul>
         )}
-        {getFriends.map((friend:any) => (
+       {getFriends.length === 0 ?  <h3 className="font-normal px-2 place-items-center italic text-foreground dark:text-white truncate">search for friends to start chating</h3>
+         : getFriends.map((friend:any) => (
           <button
             key={friend._id}
             onClick={() => onSelectChat(friend._id)}
@@ -351,7 +352,7 @@ const handleAddFriend = async (friend: any) => {
               <Avatar className="h-12 w-12 ring-2 ring-border/30 dark:ring-slate-700">
                 {/* <AvatarImage src={contact.avatar} alt={contact.name} /> */}
                 <AvatarFallback className="bg-muted dark:bg-slate-700 text-muted-foreground dark:text-slate-300">
-                  {getFriends.fullName?.slice(0, 2)}
+                  {friend.fullName?.slice(0, 2) || friend.email?.slice(0,2)}
                 </AvatarFallback>
               </Avatar>
               {/* {contact.online && (
