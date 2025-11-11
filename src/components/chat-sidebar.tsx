@@ -4,7 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { Input } from "./ui/input"
 import { Search, Settings, Moon, Sun, LogOut, UserPlus, Bell } from "lucide-react"
 import { cn } from "@/lib/utils"
-import type { Contact } from "./chat-window"
+// import type { Contact } from "./chat-window"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,8 +26,8 @@ import { MoonLoader } from "react-spinners"
 
 
 interface ChatSidebarProps {
-  contacts: Contact[]
-  activeChat: string
+  // contacts: Contact[]
+  
   onSelectChat: (chatId: string) => void
   isDarkMode: boolean
   onToggleDarkMode: () => void
@@ -42,7 +42,7 @@ interface Notification {
   read: boolean
 }
 
-export function ChatSidebar({ contacts, activeChat, onSelectChat, isDarkMode, onToggleDarkMode }: ChatSidebarProps) {
+export function ChatSidebar({ onSelectChat, isDarkMode, onToggleDarkMode }: ChatSidebarProps) {
   const dispatch = useDispatch()
   const fullName = useSelector((state: RootState) => state.auth?.fullName ?? "codestream")
   console.log("fullName:", fullName)
@@ -345,7 +345,7 @@ const handleAddFriend = async (friend: any) => {
             onClick={() => onSelectChat(friend._id)}
             className={cn(
               "w-full p-4 flex items-start gap-3 hover:bg-accent/50 dark:hover:bg-slate-800/50 transition-all elegant-hover border-b border-border/20 dark:border-slate-700/30",
-              activeChat === friend._id && "bg-accent/70 dark:bg-slate-800/70",
+              
             )}
           >
             <div className="relative">
