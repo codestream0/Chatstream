@@ -15,7 +15,7 @@ export function ChatHeader({ onClose, receiverId }: ChatHeaderProps) {
 
   // find the active friend by ID
   const receiver = getFriends.find((friend: any) => friend._id === receiverId)
-  console.log(receiver);
+  console.log(receiver );
   
 
   return (
