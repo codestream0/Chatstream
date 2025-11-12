@@ -37,6 +37,7 @@ export default function LoginPage() {
       const request = await login({email,password}).unwrap()
       console.log("login successfull:", request);
       const dispatchUser={
+        userId: request.user?.id,
         fullName:request.user?.fullName,
         email:request.user?.email,
         phoneNumber:request.user?.phoneNumber,
