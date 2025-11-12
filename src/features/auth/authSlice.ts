@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface AuthState{
-
+  userId:string;
   fullName:string,
   email:string,
   phoneNumber:string,
@@ -11,6 +11,7 @@ interface AuthState{
 }
 
 const initialState: AuthState = {
+  userId:"",
   fullName: "",
   email: "",
   phoneNumber: "",
@@ -28,6 +29,7 @@ const authSlice = createSlice({
     },
     logout: (state) => {
       return{
+        userId:"",
         fullName: "",
         email: "",
         phoneNumber: "",
