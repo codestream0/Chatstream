@@ -33,6 +33,7 @@ export default function SignupPage() {
       const request = await signup({fullName:name,email,phoneNumber,password}).unwrap();
       console.log("Signup successful:", request) 
       const dispatchUser={
+        userId: request.user?.userWithoutPassword._id,
         fullName:request.user?.userWithoutPassword?.fullName,
         email:request.user?.userWithoutPassword?.email,
         phoneNumber:request.user?.userWithoutPassword?.phoneNumber,
