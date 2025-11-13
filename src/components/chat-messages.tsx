@@ -24,7 +24,12 @@ export function ChatMessages({ messages, isTyping }: ChatMessagesProps) {
   }, [messages, isTyping])
 
   return (
-    <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
+    <div 
+      className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar scroll-smooth "
+      style={{
+        maxHeight: "calc(100vh - 300px)", 
+      }}
+    >
       {messages.map((message, index) => {
         const isOwnMessage = message.senderId === currentUserId
         return (
