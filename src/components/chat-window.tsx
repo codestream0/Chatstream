@@ -33,9 +33,11 @@ export function ChatWindow() {
   const [isTyping, setIsTyping] = useState(false)
 
 useEffect(() => {
-  if (!userId || !socket) return;
+  if ( !activeChat || !userId || !socket) return;
 
   socket.emit("register", userId);
+
+  socket.emit("getMessages", { userA: userId, userB: activeChat });
 
   const handleReceiveMessage = (message: Message) => {
     setMessages((prev) => [...prev, message]);
@@ -45,23 +47,22 @@ useEffect(() => {
     setMessages((prev) => [...prev, ...offlineMessages]);
   };
 
-  // const handleMessageSent = (message: Message) => {
-  //   setMessages((prev) => {
-  //     const exists = prev.some((m) => m._id === message._id);
-  //     return exists ? prev : [...prev, message];
-  //   });
-  // };
+  const handleChatHistory = (messages:Message[])=>{
+    setMessages(messages)
+  }
+
+
 
   socket.on("receiveMessage", handleReceiveMessage);
   socket.on("offlineMessage", handleOfflineMessages);
-  // socket.on("messageSent", handleMessageSent);
+  socket.on("chatHistory", handleChatHistory)
 
   return () => {
     socket.off("receiveMessage", handleReceiveMessage);
     socket.off("offlineMessage", handleOfflineMessages);
-    // socket.off("messageSent", handleMessageSent);
+    socket.off("chatHistory", handleChatHistory)
   };
-}, [userId, socket]);
+}, [activeChat , userId, socket]);
 
 
 const handleSendMessage = (text: string) => {
