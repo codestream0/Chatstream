@@ -19,10 +19,13 @@ export interface Message {
   createdAt?: string;
   updatedAt?: string;
   read?: boolean;
+  sender?:{
+    fullName:string;
+  }
 }
 
 
-const socket = io("http://localhost:3300", { transports: ["websocket"] }) // your backend URL
+const socket = io("http://localhost:3300", { transports: ["websocket"] }) 
 
 export function ChatWindow() {
   const userId = useSelector((state: RootState) => state.auth.userId)

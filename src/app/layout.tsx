@@ -8,6 +8,7 @@ import { PersistGate } from "redux-persist/integration/react";
 import { Provider } from "react-redux";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
+import LogoutWatcher from "./logoutWatcher";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,6 +38,7 @@ export default function RootLayout({
       >
         <Provider store={store}>
           <PersistGate loading={null} persistor={persistor} >
+            <LogoutWatcher/>
             {children}
           </PersistGate>
         </Provider>

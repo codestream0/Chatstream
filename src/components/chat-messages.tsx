@@ -41,7 +41,8 @@ export function ChatMessages({ messages, isTyping }: ChatMessagesProps) {
             {!isOwnMessage && (
               <Avatar className="h-8 w-8 flex-shrink-0 ring-2 ring-border/20 dark:ring-slate-700 shadow-sm">
                 <AvatarFallback className="bg-muted dark:bg-slate-700 text-muted-foreground dark:text-slate-300 text-xs">
-                  {message.senderId?.slice(0, 2).toUpperCase()}
+                  {message.sender?.fullName.split(" ").map(word=>word[0]).join("")
+                  .slice(0, 2).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
             )}
