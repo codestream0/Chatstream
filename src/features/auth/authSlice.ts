@@ -27,6 +27,11 @@ const authSlice = createSlice({
     createUser: (state, action: PayloadAction<Partial<AuthState>>) => {
      Object.assign(state, action.payload);
     },
+
+     setAccessToken: (state, action: PayloadAction<string>) => {
+      state.accessToken = action.payload;
+    },
+
     logout: (state) => {
       return{
         userId:"",
@@ -43,5 +48,5 @@ const authSlice = createSlice({
   
 
 
-export const { createUser, logout } = authSlice.actions;
+export const { createUser, logout,setAccessToken } = authSlice.actions;
 export default authSlice.reducer;
