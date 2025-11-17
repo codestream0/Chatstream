@@ -50,3 +50,4 @@ export const baseQueryWithAuth = async (
 
   return result;
 };
+

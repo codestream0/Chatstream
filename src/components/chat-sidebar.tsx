@@ -312,7 +312,7 @@ const handleAddFriend = async (friend: any) => {
       {/* Contacts List */}
       <div className="flex-1 overflow-y-auto custom-scrollbar min-h-96 ">
         {isFetching && (<MoonLoader size={16} color="black"/>)}
-        {friends?.length > 0 && (
+        {friends?.length > 0  && (
           <ul className="px-2 py-2">
             {friends.map((friend:any) => (
             <li key={friend._id || friend.email } className="flex items-center justify-between p-2 mb-2 bg-gray-200  dark:bg-gray-400 rounded-md">

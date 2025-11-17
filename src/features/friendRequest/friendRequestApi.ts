@@ -9,7 +9,8 @@ export const friendRequestApi = api.injectEndpoints({
                 url:"/friends/request",
                 method:"POST",
                 body:credentials
-            })
+            }),
+            invalidatesTags:["friends"]
         }),
 
         respondFriendRequests:builder.mutation({
@@ -22,11 +23,13 @@ export const friendRequestApi = api.injectEndpoints({
         }),
 
         getFriendRequests:builder.query<any,void>({
-            query: ()=> "/friends/pending"
+            query: ()=> "/friends/pending",
+            providesTags:["friends"]
         }),
 
         searchFriends:builder.query({
             query:(query)=> `/friends/search?query=${encodeURIComponent(query)}`,
+            providesTags:["friends"]
         }),
 
         getFriends:builder.query<any,void>({
