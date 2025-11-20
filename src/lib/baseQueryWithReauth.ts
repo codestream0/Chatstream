@@ -3,7 +3,7 @@ import {  fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3300",
+  baseUrl: process.env.NEXT_PUBLIC_API_URL || "courageous-sprite-e7dae6.netlify.app",
   credentials: "include",
   prepareHeaders: (headers = new Headers(), { getState }) => {
     const token = (getState() as RootState)?.auth?.accessToken;
